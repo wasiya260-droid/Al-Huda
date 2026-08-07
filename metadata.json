@@ -1,0 +1,6 @@
+{
+  "name": "Al-Huda - Quranic Guidance & Divine Healing",
+  "description": "An ethereal Islamic application providing Quranic guidance and Prophetic teachings (Sunnah) for moods, life situations, temptations, and ailments with AI spiritual counseling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
