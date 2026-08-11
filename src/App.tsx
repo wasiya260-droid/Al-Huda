@@ -13,10 +13,18 @@ import { RuqyahHealingView } from './components/RuqyahHealingView';
 import { SpiritualBoostView } from './components/SpiritualBoostView';
 import { TasbeehCounter } from './components/TasbeehCounter';
 import { SavedBookmarksView } from './components/SavedBookmarksView';
+import { SecretTawbahBoxView } from './components/SecretTawbahBoxView';
+import { RefugeSinReminderView } from './components/RefugeSinReminderView';
+import { MoodMeterTrackerView } from './components/MoodMeterTrackerView';
+import { DailyRecitationView } from './components/DailyRecitationView';
+import { IslamicLifestyleView } from './components/IslamicLifestyleView';
 import { MoodCategory, BookmarkItem } from './types';
 import { Heart, Shield, BookOpen, Sparkles } from 'lucide-react';
 
-export default function App() {
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+
+function AppContent() {
+  const { palette } = useTheme();
   const [activeTab, setActiveTab] = useState<TabType>('moods');
   const [selectedMood, setSelectedMood] = useState<MoodCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,9 +62,12 @@ export default function App() {
   const savedBookmarkIds = bookmarks.map((b) => b.id);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950">
-      {/* Top Background Glow Lattices */}
-      <div className="fixed top-0 left-0 right-0 h-96 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(217,119,6,0.15),rgba(255,255,255,0))] pointer-events-none z-0" />
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950 transition-colors duration-500">
+      {/* Dynamic Top Background Glow Lattices */}
+      <div 
+        className="fixed top-0 left-0 right-0 h-[30rem] pointer-events-none z-0 transition-all duration-700" 
+        style={{ background: palette.bgGlowGradient }}
+      />
 
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navigation Bar */}
@@ -95,6 +106,21 @@ export default function App() {
               savedBookmarkIds={savedBookmarkIds}
             />
           )}
+
+          {activeTab === 'secret_tawbah' && (
+            <SecretTawbahBoxView
+              onSaveBookmark={handleSaveBookmark}
+              savedBookmarkIds={savedBookmarkIds}
+            />
+          )}
+
+          {activeTab === 'refuge_sin' && <RefugeSinReminderView />}
+
+          {activeTab === 'mood_meter' && <MoodMeterTrackerView />}
+
+          {activeTab === 'recitation' && <DailyRecitationView />}
+
+          {activeTab === 'sunnah_lifestyle' && <IslamicLifestyleView />}
 
           {activeTab === 'tawbah' && <SinToTawbahView />}
 
@@ -137,4 +163,12 @@ export default function App() {
       </div>
     </div>
   );
-};
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}

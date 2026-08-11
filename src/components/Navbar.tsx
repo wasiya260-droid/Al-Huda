@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   HeartHandshake, 
   Sparkles, 
@@ -7,11 +7,30 @@ import {
   Sun, 
   CircleDot, 
   Bookmark, 
-  BookOpen 
+  BookOpen,
+  Lock,
+  Zap,
+  HeartPulse,
+  Apple,
+  Palette
 } from 'lucide-react';
 import { AmbientSoundPlayer } from './AmbientSoundPlayer';
+import { useTheme } from '../context/ThemeContext';
+import { ThemePickerModal } from './ThemePickerModal';
 
-export type TabType = 'moods' | 'ai_counselor' | 'tawbah' | 'ruqyah' | 'boost' | 'tasbeeh' | 'bookmarks';
+export type TabType = 
+  | 'moods' 
+  | 'ai_counselor' 
+  | 'secret_tawbah' 
+  | 'refuge_sin' 
+  | 'mood_meter' 
+  | 'recitation' 
+  | 'sunnah_lifestyle' 
+  | 'tawbah' 
+  | 'ruqyah' 
+  | 'boost' 
+  | 'tasbeeh' 
+  | 'bookmarks';
 
 interface NavbarProps {
   activeTab: TabType;
@@ -20,12 +39,20 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, bookmarkCount }) => {
+  const { palette } = useTheme();
+  const [isThemeModalOpen, setIsThemeModalOpen] = useState(false);
+
   const navItems: { id: TabType; label: string; icon: React.ReactNode; highlight?: boolean }[] = [
-    { id: 'moods', label: 'Moods & Situations', icon: <HeartHandshake className="w-4 h-4" /> },
+    { id: 'moods', label: 'Moods & Verses', icon: <HeartHandshake className="w-4 h-4" /> },
     { id: 'ai_counselor', label: 'Ask Al-Huda AI', icon: <Sparkles className="w-4 h-4" />, highlight: true },
-    { id: 'tawbah', label: 'Path to Tawbah', icon: <ShieldAlert className="w-4 h-4" /> },
-    { id: 'ruqyah', label: 'Divine Ruqyah & Cure', icon: <Activity className="w-4 h-4" /> },
-    { id: 'boost', label: 'Ayat Quote Builder', icon: <Sun className="w-4 h-4" /> },
+    { id: 'secret_tawbah', label: 'Confidential Tawbah Box', icon: <Lock className="w-4 h-4" /> },
+    { id: 'refuge_sin', label: 'Sin Prevention & Refuge', icon: <Zap className="w-4 h-4" /> },
+    { id: 'mood_meter', label: 'Mood-o-Meter & Health', icon: <HeartPulse className="w-4 h-4" /> },
+    { id: 'recitation', label: 'Daily Recitation', icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'sunnah_lifestyle', label: 'Islamic Healthy Living', icon: <Apple className="w-4 h-4" /> },
+    { id: 'tawbah', label: 'Pillars of Tawbah', icon: <ShieldAlert className="w-4 h-4" /> },
+    { id: 'ruqyah', label: 'Divine Ruqyah & Healing', icon: <Activity className="w-4 h-4" /> },
+    { id: 'boost', label: 'Aesthetic Quote Studio', icon: <Sun className="w-4 h-4" /> },
     { id: 'tasbeeh', label: 'Digital Tasbeeh', icon: <CircleDot className="w-4 h-4" /> },
     { id: 'bookmarks', label: 'Saved Verses', icon: <Bookmark className="w-4 h-4" /> },
   ];
@@ -69,9 +96,22 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, bookmar
             </div>
           </div>
 
-          {/* Audio Recitation & Bookmarks Header Action */}
-          <div className="flex items-center gap-3">
+          {/* Audio Recitation, Theme Switcher & Bookmarks Header Action */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <AmbientSoundPlayer />
+
+            {/* Theme Picker Trigger */}
+            <button
+              onClick={() => setIsThemeModalOpen(true)}
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-amber-500/40 text-slate-200 text-xs font-medium transition-all flex items-center gap-2 shadow-sm group"
+              title="Change Ethereal Theme Palette"
+            >
+              <Palette className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform" />
+              <span className="hidden sm:inline-flex items-center gap-1.5">
+                <span>{palette.icon}</span>
+                <span className="font-semibold text-slate-200">{palette.name}</span>
+              </span>
+            </button>
 
             <button
               onClick={() => setActiveTab('bookmarks')}
@@ -91,6 +131,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, bookmar
             </button>
           </div>
         </div>
+
+        {/* Theme Picker Modal */}
+        <ThemePickerModal
+          isOpen={isThemeModalOpen}
+          onClose={() => setIsThemeModalOpen(false)}
+        />
 
         {/* Tab Navigation */}
         <nav className="flex items-center gap-1 overflow-x-auto pb-2 scrollbar-none border-t border-slate-900 pt-2">

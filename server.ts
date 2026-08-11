@@ -131,6 +131,138 @@ Situation Type: ${situationType || 'General Guidance'}`;
   }
 });
 
+// Confidential Secret & Shameful Act Guidance (Tawbah Box + Kaffarah + Ruqyah Shield)
+app.post("/api/secret-guidance", async (req, res) => {
+  try {
+    const { secretDescription, mistakeCategory } = req.body;
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        error: "GEMINI_API_KEY is not configured on the server.",
+      });
+    }
+
+    const systemInstruction = `You are Al-Huda Confidential Spiritual Counselor & Tawbah Advisor.
+A servant of Allah has shared a private, shameful, or burdensome mistake/sin in confidence.
+In Islam, Allah conceals the sins of His servants (As-Satteer) and commands us never to expose our sins or despair of His forgiveness.
+
+Your goal is:
+1. Provide absolute non-judgmental warmth, safety, and deep Quranic hope.
+2. Outline exact steps for Tawbah (Repentance) based on authentic Quran & Sunnah.
+3. Detail how to MAKE UP for the mistake (Kaffarah or Expiation, restoring rights, doing an erasing good deed).
+4. Provide Ruqyah protection verses and Istia'dhah (refuge) to break the habit/temptation.
+5. Provide a comforting Dua specifically suited for this situation.`;
+
+    const userPrompt = `Mistake Category: ${mistakeCategory || 'Private Sin / Mistake'}
+Confidential Description: "${secretDescription}"`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: userPrompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            verdictTitle: { type: Type.STRING, description: "Hopeful title affirming Allah's boundless mercy" },
+            reassuranceMessage: { type: Type.STRING, description: "Empathetic, soothing message assuring that Allah covers and forgives all sins upon repentance" },
+            kaffarahAndMakeUpSteps: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "Concrete actions to make up for this specific mistake (e.g. Kaffarah rules, seeking forgiveness from person if applicable, charity, replacing bad habit with good)"
+            },
+            ruqyahShield: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                arabic: { type: Type.STRING },
+                transliteration: { type: Type.STRING },
+                translation: { type: Type.STRING },
+                howToUse: { type: Type.STRING }
+              },
+              required: ["title", "arabic", "translation", "howToUse"]
+            },
+            specialTawbahDua: {
+              type: Type.OBJECT,
+              properties: {
+                arabic: { type: Type.STRING },
+                transliteration: { type: Type.STRING },
+                translation: { type: Type.STRING },
+                benefits: { type: Type.STRING }
+              },
+              required: ["arabic", "translation"]
+            },
+            erasingGoodDeeds: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "Specific Sunnah good deeds that wipe out this type of error (Hadith: 'Follow a bad deed with a good deed, it will erase it')"
+            }
+          },
+          required: ["verdictTitle", "reassuranceMessage", "kaffarahAndMakeUpSteps", "ruqyahShield", "specialTawbahDua", "erasingGoodDeeds"]
+        }
+      }
+    });
+
+    const result = JSON.parse(response.text || "{}");
+    res.json({ success: true, data: result });
+  } catch (error: any) {
+    console.error("Error in secret guidance:", error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || "Failed to process confidential guidance",
+    });
+  }
+});
+
+// Mental Health & Mood Trends AI Analysis
+app.post("/api/mood-analytics", async (req, res) => {
+  try {
+    const { logs } = req.body; // Array of past mood logs
+
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        error: "GEMINI_API_KEY is not configured.",
+      });
+    }
+
+    const systemInstruction = `You are an Islamic Mental Health & Spiritual Wellness Advisor.
+Analyze the user's recent emotional state logs and spiritual habits (e.g., prayer frequency, Quran reading, anxiety/sakinah scores).
+Provide compassionate, holistic insights blending modern mental health strategies with Islamic spiritual psychology (Ilm al-Nafs, Purification of Heart - Tazkiyah).`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: `Recent Mood Logs: ${JSON.stringify(logs)}`,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            overallAssessment: { type: Type.STRING, description: "Empathetic analysis of user's emotional and spiritual trend" },
+            spiritualHeartDiagnosis: { type: Type.STRING, description: "Spiritual state insight (e.g., Seeking Sakinah, Fighting Burnout, Craving Istighfar)" },
+            recommendedRoutine: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: "3 key daily habits for psychological & spiritual equilibrium" },
+            encouragementQuote: { type: Type.STRING, description: "Inspiring Quranic or Hadith quote tailored to their state" }
+          },
+          required: ["overallAssessment", "spiritualHeartDiagnosis", "recommendedRoutine", "encouragementQuote"]
+        }
+      }
+    });
+
+    const analytics = JSON.parse(response.text || "{}");
+    res.json({ success: true, data: analytics });
+  } catch (error: any) {
+    console.error("Error analyzing mood logs:", error);
+    res.status(500).json({
+      success: false,
+      error: error?.message || "Failed to analyze mood trends",
+    });
+  }
+});
+
 // Vite middleware & Static serving
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

@@ -107,9 +107,74 @@ export interface AIGuidanceResult {
   wordsOfReassurance: string;
 }
 
+export interface SecretGuidanceResult {
+  verdictTitle: string;
+  reassuranceMessage: string;
+  kaffarahAndMakeUpSteps: string[];
+  ruqyahShield: {
+    title: string;
+    arabic: string;
+    transliteration?: string;
+    translation: string;
+    howToUse: string;
+  };
+  specialTawbahDua: {
+    arabic: string;
+    transliteration?: string;
+    translation: string;
+    benefits?: string;
+  };
+  erasingGoodDeeds: string[];
+}
+
+export interface MoodLogEntry {
+  id: string;
+  timestamp: string;
+  date: string;
+  moodLevel: number; // 1 to 10
+  moodLabel: 'Sakinah (Peaceful)' | 'Shukr (Grateful)' | 'Anxiety (Khawf)' | 'Grief (Huzn)' | 'Remorse (Nadam)' | 'Struggling (Jihad al-Nafs)';
+  energyLevel: number; // 1 to 5
+  prayerCount: number; // 0 to 5
+  quranReadMinutes: number;
+  dhikrDone: boolean;
+  journalNote: string;
+}
+
+export interface MoodAnalyticsResult {
+  overallAssessment: string;
+  spiritualHeartDiagnosis: string;
+  recommendedRoutine: string[];
+  encouragementQuote: string;
+}
+
+export interface DailyRecitationItem {
+  id: string;
+  surahName: string;
+  arabicName: string;
+  surahNumber: number;
+  versesCount: number;
+  virtue: string;
+  bestTime: string;
+  audioUrl?: string;
+  keyVerseArabic: string;
+  keyVerseTranslation: string;
+  keyVerseRef: string;
+}
+
+export interface SunnahLifestyleItem {
+  id: string;
+  title: string;
+  arabicTitle: string;
+  category: 'nutrition' | 'sleep' | 'fitness' | 'mental' | 'hygiene';
+  summary: string;
+  hadithOrQuranRef: string;
+  keyPractices: string[];
+  modernHealthBenefit: string;
+}
+
 export interface BookmarkItem {
   id: string;
-  type: 'verse' | 'dua' | 'ruqyah' | 'ai_guidance';
+  type: 'verse' | 'dua' | 'ruqyah' | 'ai_guidance' | 'secret_guidance';
   title: string;
   arabic?: string;
   content: string;
@@ -127,4 +192,5 @@ export interface DhikrTarget {
   count: number;
   target: number;
   benefits: string;
+  reference?: string;
 }
